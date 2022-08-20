@@ -1,0 +1,5 @@
+* Dashub
+
+Manage github notifications inside emacs
+
+This repo is in draft stage and is under heavy work.
