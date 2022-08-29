@@ -1,6 +1,5 @@
 ;;;  -*- lexical-binding: t -*-
 (require 'ghub)
-(require 'evil)
 
 (defvar dashub--notifs nil
   "Used to store the list of github notifications conveniently
@@ -11,7 +10,7 @@ parsed")
   :type 'string
   :group 'dashub)
 
-(defvar dashub-timer nil "Store the TIMER object created by run-at-time, so we can cancel
+(defvar dashub--timer nil "Store the TIMER object created by run-at-time, so we can cancel
 it")
 
 (defcustom dashub--notify-delay nil
@@ -19,11 +18,11 @@ it")
   :type 'number
   :group 'dashub
   :set (lambda (symbol val)
-		 (when (timerp dashub-timer)
-		   (cancel-timer dashub-timer)
-		   (setq dashub-timer nil))
+		 (when (timerp dashub--timer)
+		   (cancel-timer dashub--timer)
+		   (setq dashub--timer nil))
 		 (when val
-		   (setq dashub-timer (run-at-time t val #'dashub--notifier))
+		   (setq dashub--timer (run-at-time t val #'dashub--notifier))
 		   )
 		 (custom-set-default symbol val)))
 
@@ -111,12 +110,12 @@ it")
 	  (propertize repo 'font-lock-face 'font-lock-keyword-face)
 	(propertize repo 'font-lock-face 'font-lock-comment-face)))
 
-(define-derived-mode dashub-notifs-mode tabulated-list-mode "dashub-notifs-mode"
+(define-derived-mode dashub-mode tabulated-list-mode "dashub-mode"
   "Mode that displays github notifications"
   ;; (kill-all-local-variables)
-  (setq mode-name "dashub-notifs-mode")
-  (setq major-mode 'dashub-notifs-mode)
-  (use-local-map dashub-notifs-mode-map)
+  (setq mode-name "dashub-mode")
+  (setq major-mode 'dashub-mode)
+  (use-local-map dashub-mode-map)
   (setq tabulated-list-format [("Repository" 35 t)
 							   ("Title" 80 t)
 							   ("Type" 30 t)
@@ -150,12 +149,12 @@ it")
 	   :urgency 'normal)
 	  )))
 
-;; (setq dashub-timer (run-at-time t 60 #'dashub--notifier))
+;; (setq dashub--timer (run-at-time t 60 #'dashub--notifier))
 
 ;; (progn
-;;   (when (timerp dashub-timer)
-;; 	(cancel-timer dashub-timer))
-;;   (setq dashub-timer nil))
+;;   (when (timerp dashub--timer)
+;; 	(cancel-timer dashub--timer))
+;;   (setq dashub--timer nil))
 
 (defun dashub--refresh-list (redraw)
   "Fetch github notifications"
@@ -207,16 +206,12 @@ content"
 
 (defun dashub ()
   "Point of entry of the mode. Create the buffer with
-dashub-notifs-mode and switch to it"
+dashub-mode and switch to it"
   (interactive)
   (let ((buff (get-buffer-create dashub--buffer-name)))
 	(with-current-buffer buff
-	  (dashub-notifs-mode))
+	  (dashub-mode))
 	(switch-to-buffer buff)))
-
-
-
-
 
 (defun dashub--get-notif-under-region (beg end)
   "Find all notifs between BEG and END region"
@@ -231,27 +226,6 @@ dashub-notifs-mode and switch to it"
 	  (widen)
 	  result)))
 
-
-(defgroup dashub-evil nil
-  "Provides evil mapping"
-  :group 'dashub
-  :prefix "dashub-evil")
-
-(defvar dashub-evil-mode-map (make-sparse-keymap))
-
-(define-minor-mode dashub-evil-mode
-  "Brings evil keybindings to dashub"
-  :lighter " dashub-evil"
-  :keymap dashub-evil-mode-map
-  :group 'dashub-evil)
-
-(add-hook 'dashub-notifs-mode-hook 'dashub-evil-mode)
-
-(evil-set-initial-state 'dashub-notifs-mode 'motion)
-
-(evil-define-key '(motion visual) dashub-evil-mode-map
-  (kbd "g") #'dashub
-  (kbd "u") #'dashub-read-notif)
 
 ;; (defun dashub-get-fake-notif-request ()
 ;;   (with-current-buffer (find-file-noselect "./mock.json")
