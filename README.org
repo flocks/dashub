@@ -3,3 +3,18 @@
 Manage github notifications inside emacs
 
 This repo is in draft stage and is under heavy work.
+
+#+begin_src emacs-lisp
+(use-package dashub
+  :straight (dashub :type git :host github :repo "flocks/dashub")
+  :config
+  (require 'dashub-evil)
+  (setq dashub--favorite-repos '("LedgerHQ/ledger-vault-api"
+								 "LedgerHQ/ledger-vault-front"
+								 "LedgerHQ/minivault"
+								 "LedgerHQ/vault-remote"
+								 "LedgerHQ/vault-ts"))
+
+  (custom-set-variables '(dashub--notify-delay 60))
+  (global-set-key (kbd "C-c G") 'dashub))
+#+end_src

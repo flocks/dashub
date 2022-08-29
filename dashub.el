@@ -130,11 +130,6 @@ it")
   (dashub--refresh-list t)
   )
 
-(setq dashub--favorite-repos '("LedgerHQ/ledger-vault-api"
-								"LedgerHQ/ledger-vault-front"
-								"LedgerHQ/minivault"
-								"LedgerHQ/vault-remote"
-								"LedgerHQ/vault-ts"))
 (defun dashub--notifier ()
   "Function run every time we refresh the notifs list"
   (let ((found
