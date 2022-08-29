@@ -7,11 +7,13 @@ parsed")
 
 (defcustom dashub--buffer-name "*dashub*"
   "Name of the main dashub buffer"
-  :type 'string)
+  :type 'string
+  :group 'dashub)
 
 (defcustom dashub--notify-delay nil
   "Time to wait before refreshing the notifs list"
   :type 'number
+  :group 'dashub
   :set (lambda (symbol val)
 		 (when (timerp dashub-timer)
 		   (cancel-timer dashub-timer)
@@ -23,7 +25,8 @@ parsed")
 
 (defcustom dashub--favorite-repos nil
   "List of repos to actively watch"
-  :type '(repeat 'string))
+  :type '(repeat 'string)
+  :group 'dashub)
 
 (defvar dashub-timer nil "Store the TIMER object created by run-at-time, so we can cancel
 it")
