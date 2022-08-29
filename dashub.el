@@ -1,5 +1,6 @@
 ;;;  -*- lexical-binding: t -*-
 (require 'ghub)
+(require 'evil)
 
 (defvar dashub--notifs nil
   "Used to store the list of github notifications conveniently
