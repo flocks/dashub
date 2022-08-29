@@ -22,8 +22,9 @@ it")
 		   (cancel-timer dashub--timer)
 		   (setq dashub--timer nil))
 		 (when val
-		   (setq dashub--timer (run-at-time t val #'dashub--notifier))
-		   )
+		   (setq dashub--timer (run-at-time t val
+											(lambda ()
+											  (dashub--refresh-list nil)))))
 		 (custom-set-default symbol val)))
 
 (defcustom dashub--favorite-repos nil
@@ -71,21 +72,20 @@ it")
 	result))
 
 (defun dashub--format-date (date)
-  date
-  ;; (format-time-string
-  ;;  "%m/%d %H:%M"
-  ;;  (encode-time
-  ;; 	(mapcar
-  ;; 	 (lambda (x) (or x 0))
-  ;; 	 (parse-time-string date))))
+  (format-time-string
+   "%m/%d %H:%M"
+   (encode-time
+	(mapcar
+	 (lambda (x) (or x 0))
+	 (parse-time-string date))))
   )
 
 (defun dashub--notif-read-p (notif-id)
   "Whether NOTIF-ID is read or not."
-  (when-let ((notif (dashub--notif-find-notif notif-id)))
+  (when-let ((notif (dashub--find-notif notif-id)))
 	(plist-get notif :unread)))
 
-(defun dashub--notif-find-notif (notif-id)
+(defun dashub--find-notif (notif-id)
   "Find notif with id NOTIF-ID in dashub--notifs"
   (catch 'notif
 	(dolist (notif dashub--notifs)
@@ -136,7 +136,7 @@ it")
 								"LedgerHQ/vault-remote"
 								"LedgerHQ/vault-ts"))
 (defun dashub--notifier ()
-  "Function run every x seconds"
+  "Function run every time we refresh the notifs list"
   (let ((found
 		 (catch 'found
 		   (dolist (notif dashub--notifs)
@@ -213,6 +213,25 @@ dashub-mode and switch to it"
 	  (dashub-mode))
 	(switch-to-buffer buff)))
 
+(defun dashub-browser-open ()
+  (interactive)
+  (when-let* ((notif-id (tabulated-list-get-id))
+			  (notif (dashub--find-notif notif-id))
+			  (url (plist-get notif :url))
+			  (type (plist-get notif :type)))
+	(cond ((string= "PullRequest" type)
+		   (eww-browse-with-external-browser (dashub--get-pull-request-url url)))
+		  t (message (format "%s not supported" type)))))
+
+(defun dashub--get-pull-request-url (url)
+  "get browser URL from API url
+
+ie https://api.github.com/repos/orga-name/repo-name/pulls/id =>
+https://github.com/orga-name/repo-name/pull/id"
+  (string-replace "api.github.com/repos" "github.com"
+				  (string-replace "pulls" "pull" url)))
+
+
 (defun dashub--get-notif-under-region (beg end)
   "Find all notifs between BEG and END region"
   (if (not (use-region-p))
@@ -233,5 +252,6 @@ dashub-mode and switch to it"
 ;; 	(json-parse-buffer
 ;; 	  'alist
 ;; 	 :false-object 'nil)))
+
 
 (provide 'dashub)
