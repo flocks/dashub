@@ -10,6 +10,9 @@ parsed")
   :type 'string
   :group 'dashub)
 
+(defvar dashub-timer nil "Store the TIMER object created by run-at-time, so we can cancel
+it")
+
 (defcustom dashub--notify-delay nil
   "Time to wait before refreshing the notifs list"
   :type 'number
@@ -28,8 +31,6 @@ parsed")
   :type '(repeat 'string)
   :group 'dashub)
 
-(defvar dashub-timer nil "Store the TIMER object created by run-at-time, so we can cancel
-it")
 
 (defun dashub--parse-notif (notif)
   "Parse github notification into a simpler plist
