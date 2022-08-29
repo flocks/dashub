@@ -36,7 +36,7 @@ it")
 (defun dashub--parse-notif (notif)
   "Parse github notification into a simpler plist
 (:id :title :repository :url :reason :date :type :unread)"
-  (let* ((id (alist-get 'id notif)) 
+  (let* ((id (alist-get 'id notif))
 		 (subject (alist-get 'subject notif))
 		 (repo (alist-get 'full_name (alist-get 'repository notif)))
 		 (title (alist-get 'title subject))
@@ -61,8 +61,8 @@ it")
 	(dolist (notif notifs)
 	  (let* ((parsed-date (dashub--format-date (plist-get notif :date)))
 			 (parsed-reason (plist-get notif :reason))
-			(id (plist-get notif :id))
-			(unread (dashub--notif-read-p id)))
+			 (id (plist-get notif :id))
+			 (unread (dashub--notif-read-p id)))
 		(push (list id (vector (dashub--propertize-repo unread (plist-get notif :repository))
 							   (dashub--propertize-title unread (plist-get notif :title))
 							   (dashub--propertize-type unread (plist-get notif :type))
@@ -130,6 +130,7 @@ it")
   (dashub--refresh-list t)
   )
 
+
 (defun dashub--notifier ()
   "Function run every time we refresh the notifs list"
   (let ((found
@@ -158,7 +159,7 @@ it")
 			:callback (lambda (notifs &rest _)
 						(setq dashub--notifs (mapcar #'dashub--parse-notif notifs))
 						(dashub--notifier)
-						(progn 
+						(progn
 						  (setq dashub--notifs (mapcar #'dashub--parse-notif notifs))
 						  (when redraw
 							(dashub--redraw-list))
@@ -169,8 +170,8 @@ it")
   "Redraw the tabulated-list-entries based on dashub--notifs
 content"
   (with-current-buffer (get-buffer-create dashub--buffer-name)
-					  (setq tabulated-list-entries (dashub--format-notifs dashub--notifs))
-					  (tabulated-list-print t t)))
+	(setq tabulated-list-entries (dashub--format-notifs dashub--notifs))
+	(tabulated-list-print t t)))
 
 
 (defun dashub-read-notif ()
