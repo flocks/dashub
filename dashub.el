@@ -259,3 +259,5 @@ dashub-notifs-mode and switch to it"
 ;; 	(json-parse-buffer
 ;; 	  'alist
 ;; 	 :false-object 'nil)))
+
+(provide 'dashub)
