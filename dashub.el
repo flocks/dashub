@@ -252,9 +252,6 @@ dashub-notifs-mode and switch to it"
   (kbd "g") #'dashub
   (kbd "u") #'dashub-read-notif)
 
-
-(global-set-key (kbd "C-c G") 'dashub)
-
 ;; (defun dashub-get-fake-notif-request ()
 ;;   (with-current-buffer (find-file-noselect "./mock.json")
 ;; 	(goto-char (point-min))
