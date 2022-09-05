@@ -132,7 +132,7 @@ it")
   (setq tabulated-list-padding 2)
   (tabulated-list-init-header)
   (hl-line-mode 1)
-  (run-mode-hooks 'vault-mode-hook)
+  (run-mode-hooks 'dashub-mode-hook)
   (dashub--refresh-list t)
   )
 
@@ -220,8 +220,7 @@ dashub-mode and switch to it"
 		 (type (plist-get notif :type)))
 	(cond ((string= "PullRequest" type)
 		   (eww-browse-with-external-browser (dashub--get-pull-request-url url)))
-		  t (message (format "%s not supported" type))))
-  )
+		  t (message (format "%s not supported" type)))))
 
 (defun dashub-enter ()
   (interactive)
