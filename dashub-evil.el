@@ -20,7 +20,7 @@
 
 (evil-define-key '(motion visual) dashub-evil-mode-map
   (kbd "g") #'dashub
-  (kbd "RET") #'dashub-browser-open
+  (kbd "RET") #'dashub-enter
   (kbd "u") #'dashub-read-notif)
 
 (provide 'dashub-evil)

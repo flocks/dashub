@@ -1,14 +1,21 @@
 ;;;  -*- lexical-binding: t -*-
 (require 'ghub)
+(require 'notifications)
 
 (defvar dashub--notifs nil
   "Used to store the list of github notifications conveniently
-parsed")
+parsed.")
 
 (defcustom dashub--buffer-name "*dashub*"
   "Name of the main dashub buffer"
   :type 'string
   :group 'dashub)
+
+(defcustom dashub--action #'dashub--browser-open "function to call when pressing RET on an item in the
+list. Function receive the notif as parameter")
+
+(defvar dashub--query-params '((unread . "true"))
+  "params send to github API /notification endpoint")
 
 (defvar dashub--timer nil "Store the TIMER object created by run-at-time, so we can cancel
 it")
@@ -124,7 +131,6 @@ it")
 
   (setq tabulated-list-padding 2)
   (tabulated-list-init-header)
-  ;; (tabulated-list-print t)
   (hl-line-mode 1)
   (run-mode-hooks 'vault-mode-hook)
   (dashub--refresh-list t)
@@ -155,7 +161,7 @@ it")
 (defun dashub--refresh-list (redraw)
   "Fetch github notifications"
   (message "fetching notifications from github..")
-  (ghub-get "/notifications" '((unread . "true"))
+  (ghub-get "/notifications" dashub--query-params
 			:callback (lambda (notifs &rest _)
 						(setq dashub--notifs (mapcar #'dashub--parse-notif notifs))
 						(dashub--notifier)
@@ -209,15 +215,20 @@ dashub-mode and switch to it"
 	  (dashub-mode))
 	(switch-to-buffer buff)))
 
-(defun dashub-browser-open ()
+(defun dashub--browser-open (notif)
+  (let* ((url (plist-get notif :url))
+		 (type (plist-get notif :type)))
+	(cond ((string= "PullRequest" type)
+		   (eww-browse-with-external-browser (dashub--get-pull-request-url url)))
+		  t (message (format "%s not supported" type))))
+  )
+
+(defun dashub-enter ()
   (interactive)
   (when-let* ((notif-id (tabulated-list-get-id))
 			  (notif (dashub--find-notif notif-id))
-			  (url (plist-get notif :url))
-			  (type (plist-get notif :type)))
-	(cond ((string= "PullRequest" type)
-		   (eww-browse-with-external-browser (dashub--get-pull-request-url url)))
-		  t (message (format "%s not supported" type)))))
+			  )
+	(funcall dashub--action notif)))
 
 (defun dashub--get-pull-request-url (url)
   "get browser URL from API url
