@@ -156,7 +156,6 @@ it")
 
 (defun dashub--refresh-list (redraw)
   "Fetch github notifications"
-  (message "fetching notifications from github..")
   (ghub-get "/notifications" dashub--query-params
 			:callback (lambda (notifs &rest _)
 						(setq dashub--notifs (mapcar #'dashub--parse-notif notifs))
