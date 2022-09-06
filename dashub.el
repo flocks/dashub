@@ -164,9 +164,7 @@ it")
 						(progn
 						  (setq dashub--notifs (mapcar #'dashub--parse-notif notifs))
 						  (when redraw
-							(dashub--redraw-list))
-						  (when (eq 0 (length notifs))
-							(message "0 notification"))))))
+							(dashub--redraw-list))))))
 
 (defun dashub--redraw-list ()
   "Redraw the tabulated-list-entries based on dashub--notifs
