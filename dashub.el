@@ -1,6 +1,5 @@
 ;;;  -*- lexical-binding: t -*-
 (require 'ghub)
-(require 'notifications)
 
 (defvar dashub--notifs nil
   "Used to store the list of github notifications conveniently
@@ -16,6 +15,8 @@ list. Function receive the notif as parameter")
 
 (defvar dashub--query-params '((unread . "true"))
   "params send to github API /notification endpoint")
+
+(defvar dashub-alert-mode-line nil "Alert in the mode-line")
 
 (defvar dashub--timer nil "Store the TIMER object created by run-at-time, so we can cancel
 it")
@@ -123,6 +124,7 @@ it")
   (setq mode-name "dashub-mode")
   (setq major-mode 'dashub-mode)
   (use-local-map dashub-mode-map)
+  (add-to-list 'global-mode-string '(:eval dashub-alert-mode-line) t)
   (setq tabulated-list-format [("Repository" 35 t)
 							   ("Title" 80 t)
 							   ("Type" 30 t)
@@ -133,8 +135,7 @@ it")
   (tabulated-list-init-header)
   (hl-line-mode 1)
   (run-mode-hooks 'dashub-mode-hook)
-  (dashub--refresh-list t)
-  )
+  (dashub--refresh-list t))
 
 
 (defun dashub--notifier ()
@@ -144,12 +145,7 @@ it")
 		   (dolist (notif dashub--notifs)
 			 (when (member (plist-get notif :repository) dashub--favorite-repos)
 			   (throw 'found t))))))
-	(when found
-	  (notifications-notify
-	   :title "DASHUB"
-	   :body "Unread notifs on your favorites repo"
-	   :urgency 'normal)
-	  )))
+	(setq dashub-alert-mode-line (if found "G" nil))))
 
 ;; (setq dashub--timer (run-at-time t 60 #'dashub--notifier))
 
