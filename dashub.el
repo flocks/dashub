@@ -13,6 +13,11 @@ parsed.")
 (defcustom dashub--action #'dashub--browser-open "function to call when pressing RET on an item in the
 list. Function receive the notif as parameter")
 
+(defface dashub-alert-modeline-face
+  '((t :inherit font-lock-warning-face))
+  "Face for showing the indicator in the modeline."
+  :group 'dashub)
+
 (defvar dashub--query-params '((unread . "true"))
   "params send to github API /notification endpoint")
 
@@ -145,7 +150,9 @@ it")
 		   (dolist (notif dashub--notifs)
 			 (when (member (plist-get notif :repository) dashub--favorite-repos)
 			   (throw 'found t))))))
-	(setq dashub-alert-mode-line (if found "G" nil))))
+	(setq dashub-alert-mode-line (if found
+									 (propertize "[G] " 'face 'dashub-alert-modeline-face)
+								   nil))))
 
 ;; (setq dashub--timer (run-at-time t 60 #'dashub--notifier))
 
