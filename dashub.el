@@ -95,7 +95,7 @@ it")
 
 (defun dashub--notif-read-p (notif-id)
   "Whether NOTIF-ID is read or not."
-  (when-let ((notif (dashub--find-notif notif-id)))
+  (when-let* ((notif (dashub--find-notif notif-id)))
 	(plist-get notif :unread)))
 
 (defun dashub--find-notif (notif-id)
